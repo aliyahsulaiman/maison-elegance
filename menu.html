@@ -1,0 +1,502 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Menu — Le Bistro</title>
+  <style>
+    :root{
+      --accent:#ff7a1a;
+      --muted:#f5f5f6;
+      --text:#222;
+      --card-bg:#fff;
+      --radius:16px;
+      --max-width:1100px;
+      font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+    }
+
+    *{box-sizing:border-box}
+    body{margin:0;background:linear-gradient(180deg,var(--muted),#fff 40%);color:var(--text);}
+
+    header{background:#fff;position:sticky;top:0;z-index:60;box-shadow:0 6px 18px rgba(0,0,0,0.06)}
+    .nav{max-width:var(--max-width);margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:18px}
+    .brand{display:flex;gap:12px;align-items:center;font-weight:600}
+    .brand .logo{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#ffb07a);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700}
+
+    nav ul{list-style:none;display:flex;gap:18px;margin:0;padding:0;align-items:center}
+    nav a{color:inherit;text-decoration:none;font-weight:500}
+    .reserve{background:var(--accent);color:#fff;padding:10px 16px;border-radius:999px;font-weight:600}
+
+    .cart-btn{background:transparent;border:1px solid #eee;padding:8px 12px;border-radius:999px;display:flex;gap:8px;align-items:center;cursor:pointer}
+    .cart-count{background:var(--accent);color:#fff;padding:4px 8px;border-radius:999px;font-weight:700}
+
+    main{max-width:var(--max-width);margin:40px auto;padding:0 20px}
+    .hero{ text-align:center;margin-bottom:24px }
+    .hero h1{font-size:32px;margin:0}
+    .hero p{color:#666;margin-top:10px}
+
+    .filters{display:flex;gap:10px;justify-content:center;margin:26px 0}
+    .filter-btn{background:#fff;border:1px solid #eee;padding:8px 14px;border-radius:999px;cursor:pointer}
+    .filter-btn.active{background:var(--accent);color:#fff;border-color:transparent}
+
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:22px}
+    .card{background:var(--card-bg);border-radius:14px;padding:12px;box-shadow:0 6px 18px rgba(0,0,0,0.06);display:flex;flex-direction:column}
+    .media{position:relative;border-radius:12px;overflow:hidden;height:150px;background:#eee}
+    .media img{width:100%;height:100%;object-fit:cover;display:block}
+    .price-badge{position:absolute;top:10px;right:10px;background:#fff;padding:6px 10px;border-radius:999px;font-weight:700;font-size:13px;box-shadow:0 6px 18px rgba(0,0,0,0.08)}
+
+    .card h3{margin:12px 0 6px;font-size:16px}
+    .card p{margin:0;color:#777;font-size:13px}
+    .card .meta{display:flex;justify-content:space-between;align-items:center;margin-top:12px}
+    .btn{background:var(--accent);color:#fff;padding:8px 12px;border-radius:10px;border:none;cursor:pointer;font-weight:600}
+
+    .cart-drawer{position:fixed;right:20px;top:80px;width:360px;max-width:92vw;background:#fff;border-radius:12px;box-shadow:0 20px 50px rgba(0,0,0,0.15);padding:18px;z-index:100;transform:translateX(120%);transition:transform .28s ease-in-out}
+    .cart-drawer.open{transform:translateX(0)}
+    .cart-items{max-height:340px;overflow:auto;margin-top:8px}
+    .cart-item{display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid #f3f3f3}
+    .cart-item img{width:56px;height:44px;object-fit:cover;border-radius:8px}
+    .cart-footer{display:flex;justify-content:space-between;align-items:center;margin-top:12px}
+
+    .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.45);display:none;align-items:center;justify-content:center;z-index:120}
+    .modal-backdrop.open{display:flex}
+    .modal{background:#fff;padding:18px;border-radius:12px;max-width:520px;width:96%;box-shadow:0 20px 60px rgba(0,0,0,0.2)}
+    .form-row{display:flex;gap:10px}
+    .form-row .field{flex:1}
+    input,textarea,select{width:100%;padding:10px;border:1px solid #e6e6e6;border-radius:8px;font-size:14px}
+
+    .apps{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;padding:30px 0}
+    .app{background:#fff;padding:12px 18px;border-radius:12px;box-shadow:0 6px 18px rgba(0,0,0,0.03);min-width:130px;text-align:center}
+
+    footer{background:#fff;margin-top:36px;padding:28px 20px;border-top:1px solid #eee}
+    .footer-grid{max-width:var(--max-width);margin:0 auto;display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px}
+
+    @media (max-width:700px){
+      .footer-grid{grid-template-columns:1fr}
+      .media{height:140px}
+      .cart-drawer{right:10px;top:70px;width:94vw}
+    }
+
+    .separator{height:1px;background:#f0f0f0;margin:32px 0}
+
+    .hint{background:#fffbe6;border-left:4px solid var(--accent);padding:10px;border-radius:8px;color:#664400;margin-top:12px;font-size:13px}
+
+  .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:12px 18px;border-radius:999px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .3s,transform .3s;z-index:200}.toast.show{opacity:1;transform:translateX(-50%) translateY(-6px)}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="nav">
+      <div class="brand">
+        <div class="logo">BA</div>
+        <div>
+          <div style="font-weight:700">Bon appetite</div>
+          <div style="font-size:12px;color:#777">Menu & Réservations</div>
+        </div>
+      </div>
+      <nav>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="#menu">Menu</a></li>
+          <li><a href="gallery.html">Gallery</a></li>
+          <li><a class="reserve" href="#reserve">Réserver</a></li>
+          <li><button id="open-cart" class="cart-btn" aria-label="Ouvrir le panier"><span>🛒</span><span class="cart-count" id="cart-count">0</span></button></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <h1 id="menu">Notre carte</h1>
+      <p>Une sélection soignée de plats traditionnels et modernes — savoureux et faits maison.</p>
+    </section>
+
+    <div class="filters" role="tablist" aria-label="Catégories du menu">
+      <button class="filter-btn active" data-filter="all">Tout</button>
+      <button class="filter-btn" data-filter="petit-dejeuner">Petit-déjeuner</button>
+      <button class="filter-btn" data-filter="plats">Plats</button>
+      <button class="filter-btn" data-filter="boissons">Boissons</button>
+      <button class="filter-btn" data-filter="desserts">Desserts</button>
+    </div>
+
+     <!-- === UPDATED MENU SECTION === -->
+  <section class="grid" id="items">
+    <!-- Petit-déjeuner -->
+    <article class="card" data-category="petit-dejeuner" data-id="pd1" data-price="3.0">
+      <div class="media"><img src="d36b67b43f8e2179acbd0dc1fc6f502c.jpg"><div class="price-badge">€7.00</div></div>
+      <h3>Croissant au beurre</h3>
+      <p>Pâtisserie traditionnelle française, beurrée et feuilletée.</p>
+      <div class="meta"><small>Petit-déjeuner</small><button class="btn add-to-cart">Ajouter</button></div>
+    </article>
+    <article class="card" data-category="petit-dejeuner" data-id="pd2" data-price="4.5">
+      <div class="media"><img src="17e38f3a5b2bc4fbfb80262ff12a461b.jpg" alt="Macarons"><div class="price-badge">€4.50</div></div>
+      <h3>Assortiment de macarons</h3>
+      <p>Macarons aux saveurs classiques : framboise, pistache, chocolat.</p>
+      <div class="meta"><small>Petit-déjeuner</small><button class="btn add-to-cart">Ajouter</button></div>
+    </article>
+    <article class="card" data-category="petit-dejeuner" data-id="pd3" data-price="5.0">
+      <div class="media"><img src="C:\Users\USER\Desktop\Resturant\pan die.jpg" alt="Pain au chocolat"><div class="price-badge">€5.00</div></div>
+      <h3>Pain au chocolat</h3>
+      <p>Pain feuilleté au beurre avec barres de chocolat fondant.</p>
+      <div class="meta"><small>Petit-déjeuner</small><button class="btn add-to-cart">Ajouter</button></div>
+    </article>
+
+    <!-- Plats -->
+    <article class="card" data-category="plats" data-id="p1" data-price="18.5">
+      <div class="media"><img src="df1376b50b1b63bc25cd6bb1126d96f6@-2051494217.jpg" alt="Steak frites"><div class="price-badge">€18.50</div></div>
+      <h3>Steak frites</h3>
+      <p>Entrecôte grillée, pommes de terre maison, sauce au poivre.</p>
+      <div class="meta"><small>Plats</small><button class="btn add-to-cart">Ajouter</button></div>
+    </article>
+    <article class="card" data-category="plats" data-id="p2" data-price="22.0">
+      <div class="media"><img src="C:\Users\USER\Desktop\Resturant\coa au vin.jpg" alt="Coq au vin"><div class="price-badge">€22.00</div></div>
+      <h3>Coq au vin</h3>
+      <p>Poulet mijoté au vin rouge, champignons et lardons, style français classique.</p>
+      <div class="meta"><small>Plats</small><button class="btn add-to-cart">Ajouter</button></div>
+    </article>
+    <article class="card" data-category="plats" data-id="p3" data-price="16.0">
+      <div class="media"><img src="a0f8646b9e939b43a096eeef1c2dd330.jpg " alt="Ratatouille"><div class="price-badge">€16.00</div></div>
+      <h3>Ratatouille</h3>
+      <p>Légumes mijotés à la provençale, parfumés aux herbes fraîches.</p>
+      <div class="meta"><small>Plats</small><button class="btn add-to-cart">Ajouter</button></div>
+    </article>
+
+    <!-- Boissons -->
+    <article class="card" data-category="boissons" data-id="b1" data-price="3.5">
+      <div class="media"><img src="C:\Users\USER\Desktop\Resturant\espresso.jpg" alt="Café espresso"><div class="price-badge">€3.50</div></div>
+      <h3>Café espresso</h3>
+      <p>Intense et aromatique, parfait pour bien démarrer la journée.</p>
+      <div class="meta"><small>Boissons</small><button class="btn add-to-cart">Ajouter</button></div>
+    </article>
+    <article class="card" data-category="boissons" data-id="b2" data-price="4.5">
+      <div class="media"><img src="C:\Users\USER\Desktop\Resturant\red smooothie.jpg" alt="Smoothie"><div class="price-badge">€4.50</div></div>
+      <h3>Smoothie fruits rouges</h3>
+      <p>Mélange de fraises, framboises et myrtilles frais.</p>
+      <div class="meta"><small>Boissons</small><button class="btn add-to-cart">Ajouter</button></div>
+    </article>
+    <article class="card" data-category="boissons" data-id="b3" data-price="5.0">
+      <div class="media"><img src="C:\Users\USER\Desktop\Resturant\orange juice.jpg" alt="Jus d'orange"><div class="price-badge">€5.00</div></div>
+      <h3>Jus d'orange frais</h3>
+      <p>Pressé à la main pour un goût 100% naturel.</p>
+      <div class="meta"><small>Boissons</small><button class="btn add-to-cart">Ajouter</button></div>
+    </article>
+
+    <!-- Desserts -->
+    <article class="card" data-category="desserts" data-id="d1" data-price="7.0">
+      <div class="media"><img src="C:\Users\USER\Desktop\Resturant\pancake.jpg" alt="Crêpes"><div class="price-badge">€7.00</div></div>
+      <h3>Crêpes maison</h3>
+      <p>Crêpes fines, caramel au beurre salé et fruits frais.</p>
+      <div class="meta"><small>Desserts</small><button class="btn add-to-cart">Ajouter</button></div>
+    </article>
+    <article class="card" data-category="desserts" data-id="d2" data-price="5.5">
+      <div class="media"><img src="21a8113db1a0f3f9cb45f766cacaa6df.jpg" alt="Crème brûlée"><div class="price-badge">€5.50</div></div>
+      <h3>Crème brûlée</h3>
+      <p>Classique dessert à la vanille, caramélisé à la perfection.</p>
+      <div class="meta"><small>Desserts</small><button class="btn add-to-cart">Ajouter</button></div>
+    </article>
+    <article class="card" data-category="desserts" data-id="d3" data-price="6.0">
+      <div class="media"><img src="C:\Users\USER\Desktop\Resturant\macroon.jpg" alt="Macarons"><div class="price-badge">€6.00</div></div>
+      <h3>Macarons</h3>
+      <p>Assortiment de macarons aux saveurs classiques françaises.</p>
+      <div class="meta"><small>Desserts</small><button class="btn add-to-cart">Ajouter</button></div>
+    </article>
+
+    <article class="card" data-category="petit-dejeuner" data-id="d2" data-price="5.5">
+      <div class="media"><img src="Luxe Beef Crostini met Zoete Ui en Pittige Aioli 🥖✨.jpg" alt="Crème brûlée"><div class="price-badge">€10.0</div></div>
+      <h3>Truffle Brie Crostini</h3>
+      <p>Pain artisanal grillé garni de brie crémeux, de truffe noire et d’un filet de miel.</p>
+      <div class="meta"><small>Desserts</small><button class="btn add-to-cart">Ajouter</button></div>
+    </article>
+
+    <article class="card" data-category="plats" data-id="d2" data-price="5.5">
+      <div class="media"><img src="Lobster Bisque.jpg" alt="Crème brûlée"><div class="price-badge">€50.5</div></div>
+      <h3>Lobster Bisque</h3>
+      <p>Soupe française de homard veloutée, sublimée par une touche de crème fraîche et d’herbes aromatiques.</p>
+      <div class="meta"><small>Desserts</small><button class="btn add-to-cart">Ajouter</button></div>
+    </article>
+
+    <article class="card" data-category="boissons" data-id="d2" data-price="5.5">
+      <div class="media"><img src="Sumptuous Lavender Lemon Fizz in Engraved Silver Cup 💜 Elegant Garden Tea.jpg" alt="Crème brûlée"><div class="price-badge">€10.6</div></div>
+      <h3>Lavender Royale</h3>
+      <p>Mélange raffiné de lavande, vanille et eau pétillante.</p>
+      <div class="meta"><small>Desserts</small><button class="btn add-to-cart">Ajouter</button></div>
+    </article>
+
+ <article class="card" data-category="plats" data-id="d2" data-price="5.5">
+      <div class="media"><img src="A fully-loaded bowl of seafood linguine is….jpg" alt="Crème brûlée"><div class="price-badge">€85.5</div></div>
+      <h3>Seafood Linguine Royale</h3>
+      <p>Linguines raffinées aux fruits de mer, homard, crevettes et sauce crémeuse au vin blancs.</p>
+      <div class="meta"><small>Desserts</small><button class="btn add-to-cart">Ajouter</button></div>
+    </article>
+
+  </section>
+    </section>
+
+    <div class="separator"></div>
+
+    <section style="text-align:center">
+      <h2>Commander via</h2>
+      <p style="color:#666">Vous pouvez aussi commander via les applications partenaires</p>
+
+      <div class="apps" aria-hidden="false">
+        <div class="app">Uber Eats</div>
+        <div class="app">Deliveroo</div>
+        <div class="app">Just Eat</div>
+        <div class="app">Glovo</div>
+        <div class="app">Doordash</div>
+      </div>
+
+      
+
+  </main>
+
+  <footer id="contact">
+    <div class="footer-grid">
+      <div>
+        <strong>Le Bistro</strong>
+        <p style="color:#777">Rue Exemples 12, 75000 Paris<br>Tel: +33 1 23 45 67 89</p>
+      </div>
+      <div>
+        <h4>Pages</h4>
+        <ul style="list-style:none;padding:0;color:#777">
+          <li>Accueil</li>
+          <li>Menu</li>
+          <li>Réserver</li>
+        </ul>
+      </div>
+      <div>
+        <h4>Suivez-nous</h4>
+        <p style="color:#777">Instagram • Facebook • TikTok</p>
+      </div>
+    </div>
+  </footer>
+
+  <aside class="cart-drawer" id="cart-drawer" aria-hidden="true">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <strong>Panier</strong>
+      <div>
+        <button id="close-cart" class="btn" style="background:#eee;color:var(--text);">Fermer</button>
+      </div>
+    </div>
+
+    <div class="cart-items" id="cart-items"></div>
+
+    <div class="cart-footer">
+      <div>
+        <div style="font-size:14px;color:#666">Total</div>
+        <div style="font-weight:800;font-size:18px" id="cart-total">€0.00</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <button class="btn" id="checkout">Valider & Commander</button>
+        <button class="btn" id="clear-cart" style="background:#ddd;color:#222">Vider</button>
+      </div>
+    </div>
+  </aside>
+
+  <div class="modal-backdrop" id="modal-backdrop" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="checkout-title">
+      <h3 id="checkout-title">Finaliser la commande</h3>
+      <form id="checkout-form">
+        <div class="form-row">
+          <div class="field"><input type="text" name="name" placeholder="Nom complet" required></div>
+          <div class="field"><input type="tel" name="phone" placeholder="Téléphone" required></div>
+        </div>
+        <div style="margin-top:8px"><input type="text" name="address" placeholder="Adresse / Remarques (optionnel)"></div>
+        <div style="margin-top:8px"><textarea name="notes" placeholder="Instructions spéciales (optionnel)" rows="3"></textarea></div>
+
+        <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+          <button type="submit" class="btn">Envoyer par Email</button>
+          <button type="button" id="whatsapp-send" class="btn">Envoyer via WhatsApp</button>
+          <button type="button" id="webhook-send" class="btn" style="background:#4b8cff">Envoyer au webhook</button>
+          <button type="button" id="close-modal" class="btn" style="background:#eee;color:#222">Annuler</button>
+        </div>
+
+      </form>
+
+      <p style="font-size:13px;color:#666;margin-top:10px">Astuce: pour ton projet de cybersécurité, teste les trois méthodes et attache un serveur intermédiaire (serverless) pour inspecter et valider les commandes côté backend.</p>
+    </div>
+  </div>
+
+  <script>
+    const buttons = document.querySelectorAll('.filter-btn');
+    const cards = document.querySelectorAll('.card');
+
+    buttons.forEach(btn => btn.addEventListener('click', () => {
+      buttons.forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      const f = btn.dataset.filter;
+      cards.forEach(c => {
+        if(f === 'all') { c.style.display = ''; return }
+        c.style.display = c.dataset.category === f ? '' : 'none';
+      })
+    }));
+
+    buttons.forEach((b,i)=> b.addEventListener('keydown', e=>{
+      if(e.key === 'ArrowRight') buttons[(i+1)%buttons.length].focus();
+      if(e.key === 'ArrowLeft') buttons[(i-1+buttons.length)%buttons.length].focus();
+    }))
+
+    const cartKey = 'leBistroCart_v1';
+    const cart = loadCart();
+    const cartCountEl = document.getElementById('cart-count');
+    const cartItemsEl = document.getElementById('cart-items');
+    const cartTotalEl = document.getElementById('cart-total');
+    const drawer = document.getElementById('cart-drawer');
+    const openCartBtn = document.getElementById('open-cart');
+    const closeCartBtn = document.getElementById('close-cart');
+    const clearCartBtn = document.getElementById('clear-cart');
+    const checkoutBtn = document.getElementById('checkout');
+
+    function saveCart(){
+      localStorage.setItem(cartKey, JSON.stringify(cart));
+      renderCart();
+    }
+
+    function loadCart(){
+      try{ const raw = localStorage.getItem(cartKey); return raw ? JSON.parse(raw) : {items:[]}; }catch(e){return {items:[]}}
+    }
+
+    function addToCart(item){
+      const existing = cart.items.find(i=>i.id===item.id);
+      if(existing) existing.qty += 1; else cart.items.push({...item, qty:1});
+      saveCart();
+    }
+
+    function removeFromCart(id){
+      const idx = cart.items.findIndex(i=>i.id===id);
+      if(idx>-1) cart.items.splice(idx,1);
+      saveCart();
+    }
+
+    function setQty(id, qty){
+      const it = cart.items.find(i=>i.id===id);
+      if(!it) return;
+      it.qty = Math.max(0, qty);
+      if(it.qty===0) removeFromCart(id);
+      saveCart();
+    }
+
+    function clearCart(){ cart.items = []; saveCart(); }
+
+    function renderCart(){
+      cartCountEl.textContent = cart.items.reduce((s,i)=>s+i.qty,0);
+      cartItemsEl.innerHTML = '';
+      let total = 0;
+      cart.items.forEach(it=>{
+        total += it.price * it.qty;
+        const div = document.createElement('div'); div.className = 'cart-item';
+        div.innerHTML = `
+          <img src="${it.img}" alt="${escapeHtml(it.name)}">
+          <div style="flex:1">
+            <div style="font-weight:700">${escapeHtml(it.name)}</div>
+            <div style="font-size:13px;color:#666">€${(it.price).toFixed(2)} × ${it.qty}</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
+            <input type="number" min="0" value="${it.qty}" data-id="${it.id}" style="width:60px;padding:6px;border-radius:6px;border:1px solid #eee">
+            <button data-remove="${it.id}" style="background:transparent;border:none;color:#ff4b4b;cursor:pointer">Supprimer</button>
+          </div>`;
+        cartItemsEl.appendChild(div);
+      });
+      cartTotalEl.textContent = `€${total.toFixed(2)}`;
+
+      cartItemsEl.querySelectorAll('input[type=number]').forEach(inp=>{
+        inp.addEventListener('change', e=>{
+          const id = e.target.dataset.id; setQty(id, parseInt(e.target.value||0,10));
+        })
+      });
+      cartItemsEl.querySelectorAll('[data-remove]').forEach(btn=>btn.addEventListener('click', e=>{
+        removeFromCart(e.target.dataset.remove);
+      }));
+    }
+
+    function escapeHtml(str){ return String(str).replace(/[&<>\"']/g, function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[m]; }); }
+
+    document.querySelectorAll('.add-to-cart').forEach(btn=>btn.addEventListener('click', e=>{
+      const card = e.target.closest('.card');
+      const id = card.dataset.id;
+      const name = card.querySelector('h3').textContent.trim();
+      const price = parseFloat(card.dataset.price);
+      const img = card.querySelector('img')?.src || '';
+      addToCart({id,name,price,img});
+      showToast('Added to cart');
+      openDrawer();
+    }));
+
+    openCartBtn.addEventListener('click', openDrawer);
+    closeCartBtn.addEventListener('click', closeDrawer);
+    clearCartBtn.addEventListener('click', ()=>{ if(confirm('Vider le panier ?')) clearCart(); });
+
+    function openDrawer(){ drawer.classList.add('open'); drawer.setAttribute('aria-hidden','false'); renderCart(); }
+    function closeDrawer(){ drawer.classList.remove('open'); drawer.setAttribute('aria-hidden','true'); }
+
+    const modal = document.getElementById('modal-backdrop');
+    const checkoutModalBtn = document.getElementById('checkout');
+    const closeModalBtn = document.getElementById('close-modal');
+    const whatsappSendBtn = document.getElementById('whatsapp-send');
+    const webhookSendBtn = document.getElementById('webhook-send');
+    const checkoutForm = document.getElementById('checkout-form');
+
+    checkoutModalBtn.addEventListener('click', ()=>{
+      if(cart.items.length===0){ alert('Panier vide'); return }
+      modal.classList.add('open'); modal.setAttribute('aria-hidden','false');
+    });
+    closeModalBtn.addEventListener('click', ()=>{ modal.classList.remove('open'); modal.setAttribute('aria-hidden','true'); });
+
+    checkoutForm.addEventListener('submit', e=>{
+      e.preventDefault();
+      const fd = new FormData(checkoutForm);
+      const payload = buildOrderPayload(fd);
+      const subject = encodeURIComponent('Nouvelle commande - Le Bistro');
+      const body = encodeURIComponent(payload.plainText);
+      const mailto = `mailto:restaurant@example.com?subject=${subject}&body=${body}`;
+      window.location.href = mailto;
+    });
+
+    whatsappSendBtn.addEventListener('click', ()=>{
+      if(cart.items.length===0){ alert('Panier vide'); return }
+      const fd = new FormData(checkoutForm);
+      const payload = buildOrderPayload(fd);
+      const phone = '2347071288125';
+      const text = encodeURIComponent(payload.plainText);
+      const wa = `https://wa.me/${phone}?text=${text}`;
+      window.open(wa,'_blank');
+    });
+
+    webhookSendBtn.addEventListener('click', async ()=>{
+      if(cart.items.length===0){ alert('Panier vide'); return }
+      const fd = new FormData(checkoutForm);
+      const payload = buildOrderPayload(fd);
+      const webhookUrl = 'https://example.com/webhook';
+      try{
+        const res = await fetch(webhookUrl, {
+          method: 'POST',
+          headers: { 'Content-Type':'application/json' },
+          body: JSON.stringify({ order: payload.json })
+        });
+        if(res.ok) alert('Commande envoyée au serveur (webhook)'); else alert("Erreur lors de l'envoi au webhook");
+      }catch(err){ alert("Impossible d'atteindre le webhook (tester avec un serveur)."); }
+    });
+
+    function buildOrderPayload(fd){
+      const obj = {name:fd.get('name')||'', phone:fd.get('phone')||'', address:fd.get('address')||'', notes:fd.get('notes')||'', items:[]};
+      let total = 0; cart.items.forEach(i=>{ obj.items.push({id:i.id,name:i.name,price:i.price,qty:i.qty}); total += i.price*i.qty });
+      obj.total = total;
+      let lines = [];
+      lines.push(`Commande pour: ${obj.name}`);
+      lines.push(`Tel: ${obj.phone}`);
+      if(obj.address) lines.push(`Adresse: ${obj.address}`);
+      lines.push('---');
+      obj.items.forEach(it=> lines.push(`${it.qty} × ${it.name} — €${(it.price*it.qty).toFixed(2)}`));
+      lines.push('---');
+      lines.push(`Total: €${total.toFixed(2)}`);
+      if(obj.notes) lines.push('Remarques: ' + obj.notes);
+      const plainText = lines.join('\n');
+      return { json: obj, plainText };
+    }
+
+    renderCart();
+    function showToast(text){let t=document.getElementById('toast');if(!t){t=document.createElement('div');t.id='toast';t.className='toast';document.body.appendChild(t)}t.textContent=text;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000)}
+    window.__leBistro = { cart, addToCart, removeFromCart, setQty, saveCart, clearCart };
+  </script>
+</body>
+</html>
