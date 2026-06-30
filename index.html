@@ -6,27 +6,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Resturant</title>
  <style>
+   body{
+margin:0;
+padding:0;
+overflow-x:hidden;
+}
      #section1{
          background: url(45f8924d30d4990157b1d1061f72a818.jpg);
-         width: 100%;
-height: 90vh;
-background-size: cover;
-background-position: center;
-display: flex;
+width:100%;
+height:100vh;
+background-size:cover;
+background-position:center;
+display:flex;
 flex-direction:column;
-justify-content: center;
-padding-top: 20px;
-align-items: center;
-     }
+justify-content:center;
+align-items:center;
+padding:0 10px;
+box-sizing:border-box;
+}
 
-     h1{
-         font-size: 5rem;
-         color:gold;
-         text-align: center;
-       text-shadow: 0 0 5px rgba(0,0,0,0.6), 0 0 11px rgba(0,0,0,0.4) ;
-       font-family:cursive;
-
-     }
+h1{
+font-size: clamp(2.5rem, 10vw, 4rem);
+color:gold;
+text-align:center;
+font-family:cursive;
+margin-bottom:10px;
+line-height:1;
+}
 .tagline{
     font-size: 2.3rem;
     margin-bottom: 2rem;
@@ -44,7 +50,12 @@ align-items: center;
     font-weight: 600;
     border-radius: 10px;
 }
-
+.btn{
+display:flex;
+justify-content:center;
+gap:10px;
+flex-wrap:nowrap;
+}
 #section1 a.btn1{
     color: darkgoldenrod;
     background-color:white;
